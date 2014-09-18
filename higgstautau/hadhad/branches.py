@@ -161,6 +161,9 @@ KEEP = [
     "mu_staco_nTRTOutliers",
 
     "tau_jet_jvtxf",
+    "trig_L1_emtau_*",
+
+
 ]
 
 # additional branches to remove only in the output tree

@@ -523,6 +523,39 @@ class TruthMatching(EventFilter):
                     break
         return True
 
+class EFMatching(EventFilter):
+
+    def passes(self, event):
+        for tau in event.taus:
+            tau.matched_ef = False
+            tau.matched_dr_ef = 1111.
+            tau.matched_object_ef = None
+            for eftau in event.taus_EF:
+                dr = utils.dR(tau.eta, tau.phi, eftau.eta, eftau.phi)
+                if dr < 0.2:
+                    # TODO: handle possible collision!
+                    tau.matched_ef = True
+                    tau.matched_dr_ef = dr
+                    tau.matched_object_ef = eftau
+                    break
+        return True
+
+class L1Matching(EventFilter):
+
+    def passes(self, event):
+        for tau in event.taus:
+            tau.matched_l1 = False
+            tau.matched_dr_l1 = 1111.
+            tau.matched_object_l1 = None
+            if tau.matched_ef:
+                eftau = tau.matched_object_ef
+                for l1tau in event.taus_L1:
+                    if eftau.RoIWord == l1tau.RoIWord:
+                        tau.matched_l1 = True
+                        tau.matched_dr_l1 = utils.dR(tau.eta, tau.phi, l1tau.eta, l1tau.phi)
+                        tau.matched_object_l1 = l1tau
+                        break
+        return True
 
 class RecoJetTrueTauMatching(EventFilter):
 

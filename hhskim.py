@@ -450,6 +450,10 @@ class hhskim(ATLASStudent):
                     count_funcs=count_funcs),
                 TaudR(3.2,
                     count_funcs=count_funcs),
+                EFMatching(
+                    count_funcs=count_funcs),
+                L1Matching(
+                    count_funcs=count_funcs),
                 #TauTriggerMatchThreshold(
                 #    datatype=datatype,
                 #    tree=tree,

@@ -16,6 +16,7 @@ functionality to Tree objects ("decorating" them).
 
 __all__ = [
     'FourMomentum',
+    'FourMomentumL1',
     'FourMomentumMeV',
     'JetFourMomentum',
     'TauFourMomentum',
@@ -49,6 +50,30 @@ class MatchedObject(object):
 
     def matches_vect(self, vect, thresh=.2):
         return self.dr_vect(vect) < thresh
+
+
+class FourMomentumL1(MatchedObject):
+
+    def __init__(self):
+        self.fourvect_boosted = LorentzVector()
+        super(FourMomentumL1, self).__init__()
+
+    @cached_property
+    def fourvect(self):
+        vect = LorentzVector()
+        vect.SetPtEtaPhiM(self.tauClus, self.eta, self.phi, self.m)
+        return vect
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return "%s (m: %.3f MeV, pt: %.1f MeV, eta: %.2f, phi: %.2f)" % \
+            (self.__class__.__name__,
+             self.m,
+             self.tauClus,
+             self.eta,
+             self.phi)
 
 
 class FourMomentum(MatchedObject):

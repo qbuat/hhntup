@@ -16,6 +16,11 @@ def define_objects(tree, year):
         prefix="trig_EF_tau_",
         size="trig_EF_tau_n",
         mix=TauFourMomentum)
+    tree.define_collection(
+        name="taus_L1",
+        prefix="trig_L1_emtau_",
+        size="trig_L1_emtau_n",
+        mix=FourMomentumL1)
     # jet_* etc. is AntiKt4LCTopo_* in NTUP_TAU
     tree.define_collection(
         name="jets",

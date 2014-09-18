@@ -54,6 +54,15 @@ class EmbeddingModel(TreeModel):
     embedding_isolation = IntCol()
     embedding_spin_weight = FloatCol(default=1.)
 
+class EFTau(FourMomentum):
+    roiword = IntCol(default=-1)
+
+class L1Tau(FourMomentum):
+    roiword = IntCol(default=-1)
+    emisol = FloatCol()
+    hadisol = FloatCol()
+    core = FloatCol()
+    hadcore = FloatCol()
 
 class RecoTau(FourMomentum):
     index = IntCol(default=-1)
@@ -456,6 +465,58 @@ class TrueTauBlock((TrueTau + MatchedObject).prefix('truetau1_') +
             else:
                 tree.truetau_pt_ratio = 0
 
+class EFTauBlock((EFTau + MatchedObject).prefix('eftau1_') +
+                   (EFTau + MatchedObject).prefix('eftau2_')):
+    dR_eftaus = FloatCol(default=-1)
+    dEta_eftaus = FloatCol(default=-1)
+    dPhi_eftaus = FloatCol(default=-1)
+
+    @classmethod
+    def set(cls, tree, tau1, tau2):
+        if tau1.matched_ef:
+            eftau = tau1.matched_object_ef
+            tree_object = tree.eftau
+            EFTau.set(tree_object, eftau.fourvect)
+            EFTau.set_vis(tree_object, eftau.fourvect_vis)
+        if tau2.matched_ef:
+            eftau = tau2.matched_object_ef
+            tree_object = tree.eftau
+            tree_object.roiword = eftau.RoIWord
+            EFTau.set(tree_object, eftau.fourvect)
+            EFTau.set_vis(tree_object, eftau.fourvect_vis)
+        # angular variables
+        if tau1.matched_ef and tau2.matched_ef:
+            eftau1 = tau1.matched_object_ef.fourvect_vis
+            eftau2 = tau2.matched_object_ef.fourvect_vis
+            tree.dR_eftaus = eftau1.DeltaR(eftau2)
+            tree.dEta_eftaus = abs(eftau2.Eta() - eftau1.Eta())
+            tree.dPhi_eftaus = abs(eftau1.DeltaPhi(eftau2))
+
+class L1TauBlock((L1Tau + MatchedObject).prefix('l1tau1_') +
+                   (L1Tau + MatchedObject).prefix('l1tau2_')):
+    dR_l1taus = FloatCol(default=-1)
+    dEta_l1taus = FloatCol(default=-1)
+    dPhi_l1taus = FloatCol(default=-1)
+
+    @classmethod
+    def set(cls, tree, tau1, tau2):
+        if tau1.matched_l1:
+            l1tau = tau1.matched_object_l1
+            tree_object = tree.l1tau
+            L1Tau.set(tree_object, l1tau.fourvect)
+        if tau2.matched_l1:
+            l1tau = tau2.matched_object_l1
+            tree_object = tree.l1tau
+            tree_object.roiword = l1tau.RoIWord
+            L1Tau.set(tree_object, l1tau.fourvect)
+        # angular variables
+        if tau1.matched_l1 and tau2.matched_l1:
+            l1tau1 = tau1.matched_object_l1.fourvect
+            l1tau2 = tau2.matched_object_l1.fourvect
+            tree.dR_l1taus = l1tau1.DeltaR(l1tau2)
+            tree.dEta_l1taus = abs(l1tau2.Eta() - l1tau1.Eta())
+            tree.dPhi_l1taus = abs(l1tau1.DeltaPhi(l1tau2))
+
 class EventModel(TreeModel):
     trigger = BoolCol(default=True)
 
@@ -520,7 +581,7 @@ class InclusiveHiggsModel(TreeModel):
 
 
 def get_model(datatype, name, prefix=None, is_inclusive_signal=False):
-    model = EventModel + MassModel + METModel + RecoTauBlock + RecoJetBlock
+    model = EventModel + MassModel + METModel + RecoTauBlock + RecoJetBlock + EFTauBlock + L1TauBlock
     if datatype in (datasets.EMBED, datasets.MCEMBED):
         model += EmbeddingModel
     if datatype != datasets.DATA:
