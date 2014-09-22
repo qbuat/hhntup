@@ -237,6 +237,10 @@ class hhskim(ATLASStudent):
         tree.define_object(name='tau2', prefix='tau2_')
         tree.define_object(name='truetau1', prefix='truetau1_')
         tree.define_object(name='truetau2', prefix='truetau2_')
+        tree.define_object(name='eftau1', prefix='eftau1_')
+        tree.define_object(name='eftau2', prefix='eftau2_')
+        tree.define_object(name='l1tau1', prefix='l1tau1_')
+        tree.define_object(name='l1tau2', prefix='l1tau2_')
         tree.define_object(name='jet1', prefix='jet1_')
         tree.define_object(name='jet2', prefix='jet2_')
         tree.define_object(name='jet3', prefix='jet3_')
@@ -921,6 +925,8 @@ class hhskim(ATLASStudent):
             # This must come after the RecoJetBlock is filled since
             # that sets the jet_beta for boosting the taus
             RecoTauBlock.set(event, tree, datatype, tau1, tau2, local=local)
+            EFTauBlock.set(tree, tau1, tau2)
+            L1TauBlock.set(tree, tau1, tau2)
             if datatype != datasets.DATA:
                 TrueTauBlock.set(tree, tau1, tau2)
 

@@ -61,7 +61,7 @@ class FourMomentumL1(MatchedObject):
     @cached_property
     def fourvect(self):
         vect = LorentzVector()
-        vect.SetPtEtaPhiM(self.tauClus, self.eta, self.phi, self.m)
+        vect.SetPtEtaPhiM(self.tauClus, self.eta, self.phi, 0.)
         return vect
 
     def __repr__(self):
@@ -70,7 +70,7 @@ class FourMomentumL1(MatchedObject):
     def __str__(self):
         return "%s (m: %.3f MeV, pt: %.1f MeV, eta: %.2f, phi: %.2f)" % \
             (self.__class__.__name__,
-             self.m,
+             0.,
              self.tauClus,
              self.eta,
              self.phi)

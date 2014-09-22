@@ -534,6 +534,7 @@ class EFMatching(EventFilter):
                 dr = utils.dR(tau.eta, tau.phi, eftau.eta, eftau.phi)
                 if dr < 0.2:
                     # TODO: handle possible collision!
+                    log.debug('Consider ef object {0} with dr={1}'.format(eftau, dr))
                     tau.matched_ef = True
                     tau.matched_dr_ef = dr
                     tau.matched_object_ef = eftau
@@ -551,6 +552,7 @@ class L1Matching(EventFilter):
                 eftau = tau.matched_object_ef
                 for l1tau in event.taus_L1:
                     if eftau.RoIWord == l1tau.RoIWord:
+                        log.debug('Consider l1 object {0}'.format(l1tau))
                         tau.matched_l1 = True
                         tau.matched_dr_l1 = utils.dR(tau.eta, tau.phi, l1tau.eta, l1tau.phi)
                         tau.matched_object_l1 = l1tau

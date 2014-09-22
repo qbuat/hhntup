@@ -55,10 +55,11 @@ class EmbeddingModel(TreeModel):
     embedding_spin_weight = FloatCol(default=1.)
 
 class EFTau(FourMomentum):
-    roiword = IntCol(default=-1)
+    RoIWord = IntCol(default=-1)
 
 class L1Tau(FourMomentum):
-    roiword = IntCol(default=-1)
+    RoIWord = IntCol(default=-1)
+    emclus = FloatCol()
     emisol = FloatCol()
     hadisol = FloatCol()
     core = FloatCol()
@@ -474,20 +475,19 @@ class EFTauBlock((EFTau + MatchedObject).prefix('eftau1_') +
     @classmethod
     def set(cls, tree, tau1, tau2):
         if tau1.matched_ef:
-            eftau = tau1.matched_object_ef
-            tree_object = tree.eftau
-            EFTau.set(tree_object, eftau.fourvect)
-            EFTau.set_vis(tree_object, eftau.fourvect_vis)
+            eftau1 = tau1.matched_object_ef
+            tree_object = tree.eftau1
+            tree_object.RoIWord = eftau1.RoIWord
+            EFTau.set(tree_object, eftau1.fourvect)
         if tau2.matched_ef:
-            eftau = tau2.matched_object_ef
-            tree_object = tree.eftau
-            tree_object.roiword = eftau.RoIWord
-            EFTau.set(tree_object, eftau.fourvect)
-            EFTau.set_vis(tree_object, eftau.fourvect_vis)
+            eftau2 = tau2.matched_object_ef
+            tree_object = tree.eftau2
+            tree_object.RoIWord = eftau2.RoIWord
+            EFTau.set(tree_object, eftau2.fourvect)
         # angular variables
         if tau1.matched_ef and tau2.matched_ef:
-            eftau1 = tau1.matched_object_ef.fourvect_vis
-            eftau2 = tau2.matched_object_ef.fourvect_vis
+            eftau1 = tau1.matched_object_ef.fourvect
+            eftau2 = tau2.matched_object_ef.fourvect
             tree.dR_eftaus = eftau1.DeltaR(eftau2)
             tree.dEta_eftaus = abs(eftau2.Eta() - eftau1.Eta())
             tree.dPhi_eftaus = abs(eftau1.DeltaPhi(eftau2))
@@ -501,14 +501,25 @@ class L1TauBlock((L1Tau + MatchedObject).prefix('l1tau1_') +
     @classmethod
     def set(cls, tree, tau1, tau2):
         if tau1.matched_l1:
-            l1tau = tau1.matched_object_l1
-            tree_object = tree.l1tau
-            L1Tau.set(tree_object, l1tau.fourvect)
+            l1tau1 = tau1.matched_object_l1
+            tree_object = tree.l1tau1
+            tree_object.RoIWord = l1tau1.RoIWord
+            tree_object.emclus = l1tau1.EMClus
+            tree_object.emisol  = l1tau1.EMIsol
+            tree_object.hadisol = l1tau1.hadIsol
+            tree_object.core    = l1tau1.core
+            tree_object.hadcore = l1tau1.hadCore
+            L1Tau.set(tree_object, l1tau1.fourvect)
         if tau2.matched_l1:
-            l1tau = tau2.matched_object_l1
-            tree_object = tree.l1tau
-            tree_object.roiword = l1tau.RoIWord
-            L1Tau.set(tree_object, l1tau.fourvect)
+            l1tau2 = tau2.matched_object_l1
+            tree_object = tree.l1tau2
+            tree_object.RoIWord = l1tau2.RoIWord
+            tree_object.emclus = l1tau2.EMClus
+            tree_object.emisol  = l1tau2.EMIsol
+            tree_object.hadisol = l1tau2.hadIsol
+            tree_object.core    = l1tau2.core
+            tree_object.hadcore = l1tau2.hadCore
+            L1Tau.set(tree_object, l1tau2.fourvect)
         # angular variables
         if tau1.matched_l1 and tau2.matched_l1:
             l1tau1 = tau1.matched_object_l1.fourvect
