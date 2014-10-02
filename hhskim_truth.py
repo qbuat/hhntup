@@ -237,6 +237,10 @@ class hhskim_truth(ATLASStudent):
         tree.define_object(name='tau2', prefix='tau2_')
         tree.define_object(name='truetau1', prefix='truetau1_')
         tree.define_object(name='truetau2', prefix='truetau2_')
+        tree.define_object(name='eftau1', prefix='eftau1_')
+        tree.define_object(name='eftau2', prefix='eftau2_')
+        tree.define_object(name='l1tau1', prefix='l1tau1_')
+        tree.define_object(name='l1tau2', prefix='l1tau2_')
         tree.define_object(name='jet1', prefix='jet1_')
         tree.define_object(name='jet2', prefix='jet2_')
         tree.define_object(name='jet3', prefix='jet3_')
@@ -318,6 +322,17 @@ class hhskim_truth(ATLASStudent):
                         local or year < 2012 or
                         datatype not in (datasets.MC, datasets.MCEMBED)),
                     count_funcs=count_funcs),
+                TauPT(2,
+                    thresh=20 * GeV,
+                    count_funcs=count_funcs),
+                TauHasTrack(2,
+                    count_funcs=count_funcs),
+                TauEta(2,
+                    count_funcs=count_funcs),
+                EFMatching(
+                        count_funcs=count_funcs),
+                L1Matching(
+                        count_funcs=count_funcs),
                 HiggsPT(
                     year=year,
                     tree=tree,
@@ -699,6 +714,8 @@ class hhskim_truth(ATLASStudent):
             # This must come after the RecoJetBlock is filled since
             # that sets the jet_beta for boosting the taus
                 RecoTauBlock.set(event, tree, datatype, tau1, tau2, local=local)
+                EFTauBlock.set(tree, tau1, tau2)
+                L1TauBlock.set(tree, tau1, tau2)
                 if datatype != datasets.DATA:
                     TrueTauBlock.set(tree, tau1, tau2)
 
