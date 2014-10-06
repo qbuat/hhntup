@@ -41,7 +41,7 @@
         embed_treename: 'tau'
         embed_sampletype: 'new'
     hh_q:
-        mc_path: '/tmp/quentin/qbuat/skims/trigger/v40'
+        mc_path: '/cluster/data09/qbuat/skims/trigger/v40'
         mc_prefix: 'group.phys-higgs.hhskim'
         mc_pattern: '*hadhad*.root*'
         mc_treename: 'tau'

@@ -258,6 +258,7 @@ for dataset in datasets:
         panda_outDS = panda_outDS.replace('filter_', '')
         panda_outDS = panda_outDS.replace('Auto_', '')
         panda_outDS = panda_outDS.replace('2JetsEW1JetQCD15GeVM40_min_n_tchannels', '')
+        panda_outDS = panda_outDS.replace('CTEQ6L1', '')
         #panda_outDS = panda_outDS.replace('physics_JetTauEtmiss', 'JetTauEtm')
         #panda_outDS = panda_outDS.replace('Inclusive', 'Inc')
         #panda_outDS = panda_outDS.replace('AUET2CT10_', '')
