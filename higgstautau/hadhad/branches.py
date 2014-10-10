@@ -162,7 +162,7 @@ KEEP = [
 
     "tau_jet_jvtxf",
     "trig_L1_emtau_*",
-
+    "trig_L1_jet_*"
 
 ]
 
