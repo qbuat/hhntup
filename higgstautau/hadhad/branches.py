@@ -13,7 +13,7 @@ REMOVE = [
     "mc_parents",
     "mc_barcode",
     # don't need vertices
-    "mc_vx_*",
+    #"mc_vx_*", <== Need these for Daniele
 
     #"jet_AntiKt4TopoEM_*", <== jet cleaning recommendation is with TopoEM jets
     #"jet_AntiKt4LCTopo_*",  <== need these for MET systematics
