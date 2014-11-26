@@ -451,7 +451,6 @@ class hhskim_truth(ATLASStudent):
             if local and syst_terms is None and not redo_selection:
                 outtree.Fill()
                 continue
-
             # sort taus and jets in decreasing order by pT
             event.taus.sort(key=lambda tau: tau.pt, reverse=True)
             event.jets.sort(key=lambda jet: jet.pt, reverse=True)
@@ -556,7 +555,7 @@ class hhskim_truth(ATLASStudent):
                     # aplanarity
                 #tree.aplanarity = aplanarity
 
-                    RecoJetBlock.set(tree, jet1, jet2, jet3, local=local)
+                RecoJetBlock.set(tree, jet1, jet2, jet3, local=local)
 
                 # mass of ditau + leading jet system
                 if jet1 is not None:
