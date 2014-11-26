@@ -281,6 +281,13 @@ class hhskim_truth(ATLASStudent):
                         'tau_out_track_n_extended' in test_tree)
 
             event_filters = EventFilterList([
+                CoreFlags(
+                    passthrough=local,
+                    count_funcs=count_funcs),
+                EmbeddingPileupPatch(
+                    passthrough=(
+                        local or year > 2011 or datatype != datasets.EMBED),
+                    count_funcs=count_funcs),
                 averageIntPerXingPatch(
                     passthrough=(
                         local or year < 2012 or datatype != datasets.MC),
@@ -310,6 +317,22 @@ class hhskim_truth(ATLASStudent):
                         local or (
                             datatype not in (datasets.MC, datasets.MCEMBED))),
                     count_funcs=count_funcs),
+                JetCopy(
+                    tree=tree,
+                    passthrough=local,
+                    count_funcs=count_funcs),
+                # IMPORTANT!
+                # JetCalibration MUST COME BEFORE ANYTHING THAT REFERS TO
+                # jet.fourvect since jet.fourvect IS CACHED!
+                JetCalibration(
+                    datatype=datatype,
+                    year=year,
+                    verbose=very_verbose,
+                    passthrough=local or nominal_values,
+                    count_funcs=count_funcs),
+                NvtxJets(
+                    tree=tree,
+                    count_funcs=count_funcs),
                 TruthMatching(
                     passthrough=datatype == datasets.DATA,
                     count_funcs=count_funcs),
@@ -327,6 +350,17 @@ class hhskim_truth(ATLASStudent):
                     datatype=datatype,
                     tree=tree,
                     passthrough=local or datatype == datasets.DATA,
+                    count_funcs=count_funcs),
+                JetPreselection(
+                    count_funcs=count_funcs),
+                NonIsolatedJet(
+                    tree=tree,
+                    count_funcs=count_funcs),
+                JetSelection(
+                    year=year,
+                    count_funcs=count_funcs),
+                RecoJetTrueTauMatching(
+                    passthrough=datatype == datasets.DATA or local,
                     count_funcs=count_funcs),
                 ClassifyInclusiveHiggsSample(
                     tree=tree,
