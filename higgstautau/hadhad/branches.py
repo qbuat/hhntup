@@ -184,4 +184,15 @@ REMOVE_OUTPUT = [
 ]
 
 # override REMOVE_OUTPUT above
-KEEP_OUTPUT = []
+KEEP_OUTPUT = [
+    'mc_pt',
+    'mc_phi',
+    'mc_eta',
+    'mc_m',
+    'mc_child_index',
+    'mc_parent_index',
+    'mc_pdgId',
+    'mc_charge',
+    'mc_status',
+    'mc_n',
+]
