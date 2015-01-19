@@ -778,7 +778,9 @@ class HiggsPT(EventFilter):
                 higgs = mc
                 break
         if higgs is None:
-            raise RuntimeError("Higgs not found!")
+            # raise RuntimeError("Higgs not found!")
+            raise RuntimeWarning("Higgs not found!")
+            return None
         self.tree.true_resonance_pt = pt
         # Only consider taus here since there are very soft photons radiated
         # off the taus but included as children of the Higgs
