@@ -193,6 +193,7 @@ class JetCleaning(EventFilter):
     def __init__(self,
                  datatype,
                  year,
+                 treename='tau',
                  level=jetcleaning.LOOSER,
                  pt_thresh=20*GeV,
                  eta_max=4.5,
@@ -203,14 +204,19 @@ class JetCleaning(EventFilter):
         self.level = level
         self.pt_thresh = pt_thresh
         self.eta_max = eta_max
-
+        self.treename = treename
     def passes(self, event):
         # using LC jets
         for jet in event.jets:
             if jet.pt <= self.pt_thresh or abs(jet.eta) >= self.eta_max:
                 continue
             LArQmean = jet.AverageLArQF / 65535.0
-            chf = jet.sumPtTrk / jet.pt
+
+            # FIX FOR RUNNING ONLY ON NTUP_COMMON
+            if self.treename == 'tau':
+                chf = jet.sumPtTrk / jet.pt
+            else:
+                chf =  jet.sumPtTrk_pv0_500MeV / jet.pt
             if jetcleaning.is_bad(
                     level=self.level,
                     quality=jet.LArQuality,
@@ -779,7 +785,6 @@ class HiggsPT(EventFilter):
                 break
         if higgs is None:
             # raise RuntimeError("Higgs not found!")
-            raise RuntimeWarning("Higgs not found!")
             return None
         self.tree.true_resonance_pt = pt
         # Only consider taus here since there are very soft photons radiated
@@ -857,3 +862,38 @@ class ClassifyInclusiveHiggsSample(EventFilter):
                 break
         self.tree.higgs_decay_channel = decay_type
         return True
+
+class FakeTauPartonMatching(EventFilter):
+
+   def __init__(self, **kwargs):
+        super(FakeTauPartonMatching, self).__init__(**kwargs)
+
+   def passes(self, event):
+       
+       log.info(50 * "*")
+       for tau in event.taus:
+           tau.matched_to_parton = False
+           tau.matched_to_parton_dr = 1111.
+           tau.matched_to_parton_object = None
+           parton_list = []
+           for idx in tau.truthAssoc_index:
+               dr = utils.dR(tau.eta, tau.phi, event.mc[idx].eta, event.mc[idx].phi)
+               if dr > 0.4:
+                   continue
+               parton_list.append(event.mc[idx])
+           stable_parton_list = [
+               p for p in parton_list if p.status == 23 and 
+               p.pdgId in [1, 2, 3, 4, 5, 6, 21]]
+
+           unstable_parton_list = [
+               p for p in parton_list if p.status == 2 and
+               p.pdgId in [1, 2, 3, 4, 5, 6, 21]]
+           if len(stable_parton_list) != 0:
+               stable_parton_list = sorted(stable_parton_list, key=lambda mc: mc.pt, reverse=True)
+           log.info("-----------------------")
+           log.info(tau)
+           if len(stable_parton_list) != 0:
+               log.info(stable_parton_list[0])
+               log.info(stable_parton_list)
+               log.info(unstable_parton_list)
+       return True

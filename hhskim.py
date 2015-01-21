@@ -116,8 +116,13 @@ class hhskim(ATLASStudent):
             '_ZH' in dsname or
             '_WH' in dsname or
             '_ttH' in dsname)
+
+        is_qcd = datatype == datasets.MC and (
+            'jetjet' in dsname or
+            'JF17' in dsname)
         log.info("DATASET: {0}".format(dsname))
         log.info("IS SIGNAL: {0}".format(is_signal))
+        log.info("IS QCD: {0}".format(is_qcd))
 
         # is this an inclusive signal sample for overlap studies?
         is_inclusive_signal = is_signal and '_inclusive' in dsname
@@ -398,6 +403,7 @@ class hhskim(ATLASStudent):
                 JetCleaning(
                     datatype=datatype,
                     year=year,
+                    treename=self.metadata.treename,
                     count_funcs=count_funcs),
                 ElectronVeto(
                     count_funcs=count_funcs),
@@ -423,6 +429,9 @@ class hhskim(ATLASStudent):
                     tree=tree,
                     passthrough=year > 2011,
                     count_funcs=count_funcs),
+                FakeTauPartonMatching(
+                        passthrough=is_qcd == False,
+                        count_funcs=count_funcs),
                 # before selecting the leading and subleading taus
                 # be sure to only consider good candidates
                 TauIDMedium(2,

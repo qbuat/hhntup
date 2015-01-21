@@ -17,10 +17,11 @@ def define_objects(tree, year):
         size="trig_EF_tau_n",
         mix=TauFourMomentum)
     # jet_* etc. is AntiKt4LCTopo_* in NTUP_TAU
+    log.info('THE TREE IS NAMED %s' % tree.name)
     tree.define_collection(
         name="jets",
-        prefix="jet_",
-        size="jet_n",
+        prefix="jet_" if tree.name == 'tau' else "jet_AntiKt4LCTopo_",
+        size="jet_n" if tree.name == 'tau' else "jet_AntiKt4LCTopo_n",
         mix=JetFourMomentum)
     tree.define_collection(
         name="jets_EM",
@@ -29,8 +30,8 @@ def define_objects(tree, year):
         mix=FourMomentum)
     tree.define_collection(
         name="truejets",
-        prefix="jet_antikt4truth_",
-        size="jet_antikt4truth_n",
+        prefix="jet_antikt4truth_" if tree.name == 'tau' else 'AntiKt4Truth_',
+        size="jet_antikt4truth_n" if tree.name == 'tau' else 'AntiKt4Truth_n',
         mix=FourMomentum)
     tree.define_collection(
         name="truetaus",
