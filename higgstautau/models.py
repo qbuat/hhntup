@@ -35,13 +35,14 @@ class FourMomentum(TreeModel):
             this.eta = vect.Eta()
 
 
-class MMCOutput(FourMomentum.prefix('resonance_')):
+class MMCOutput(FourMomentum.prefix('resonance_') + 
+                FourMomentum.prefix('tau1_') + 
+                FourMomentum.prefix('tau2_')):
     mass = FloatCol()
     MET_et = FloatCol()
     MET_etx = FloatCol()
     MET_ety = FloatCol()
     MET_phi = FloatCol()
-
 
 class MMCModel(MMCOutput.prefix('mmc0_'),
                MMCOutput.prefix('mmc1_'),

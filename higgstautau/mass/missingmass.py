@@ -126,11 +126,15 @@ class MMC(object):
             MMC_mass = -1
             MMC_resonance = ROOT.TLorentzVector(0, 0, 0, 0)
             MMC_met = ROOT.TVector2(0, 0)
+            MMC_tau1 = ROOT.TLorentzVector(0, 0, 0, 0)
+            MMC_tau2 = ROOT.TLorentzVector(0, 0, 0, 0)
             if self.tool.GetFitStatus() == 1:
                 # MMC output: 1=found solution; 0= no solution
                 MMC_mass = self.tool.GetFittedMass(method)
                 # use method 2 instead of 1 to remove spikes in output
                 MMC_resonance = self.tool.GetResonanceVec(method)
                 MMC_met = self.tool.GetFittedMetVec(method)
-            result[method] = (MMC_mass, MMC_resonance, MMC_met)
+                MMC_tau1 = self.tool.GetTau4vec(method, 0)
+                MMC_tau2 = self.tool.GetTau4vec(method, 1)
+            result[method] = (MMC_mass, MMC_resonance, MMC_met, MMC_tau1, MMC_tau2)
         return result

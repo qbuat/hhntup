@@ -254,6 +254,8 @@ class hhskim(ATLASStudent):
 
         for mmc_obj in mmc_objects:
             mmc_obj.define_object(name='resonance', prefix='resonance_')
+            mmc_obj.define_object(name='tau1', prefix='tau1_')
+            mmc_obj.define_object(name='tau2', prefix='tau2_')
 
         trigger_emulation = TauTriggerEmulation(
             year=year,
@@ -882,10 +884,10 @@ class hhskim(ATLASStudent):
                 njets=len(event.jets))
 
             for mmc_method, mmc_object in enumerate(mmc_objects):
-                mmc_mass, mmc_resonance, mmc_met = mmc_result[mmc_method]
+                mmc_mass, mmc_resonance, mmc_met, mmc_tau1, mmc_tau2 = mmc_result[mmc_method]
                 if verbose:
                     log.info("MMC (method %d): %f" % (mmc_method, mmc_mass))
-
+                
                 mmc_object.mass = mmc_mass
                 mmc_object.MET_et = mmc_met.Mod()
                 mmc_object.MET_etx = mmc_met.X()
@@ -893,6 +895,8 @@ class hhskim(ATLASStudent):
                 mmc_object.MET_phi = math.pi - mmc_met.Phi()
                 if mmc_mass > 0:
                     FourMomentum.set(mmc_object.resonance, mmc_resonance)
+                FourMomentum.set(mmc_object.tau1, mmc_tau1)
+                FourMomentum.set(mmc_object.tau2, mmc_tau2)
 
             ############################
             # collinear and visible mass
