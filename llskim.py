@@ -396,6 +396,9 @@ class llskim(ATLASStudent):
                     passthrough=year == 2011 or local,
                     datatype=datatype,
                     count_funcs=count_funcs),
+                TauVeto(
+                    year=year,
+                    count_funcs=count_funcs),
             ])
 
             # set the event filters

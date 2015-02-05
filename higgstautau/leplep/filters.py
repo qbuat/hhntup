@@ -11,6 +11,38 @@ from .. import tauid
 from ..tauid import IDLOOSE, IDMEDIUM, IDTIGHT
 from . import log; log = log[__name__]
 
+class TauVeto(EventFilter):
+    """
+    taken from 
+    https://svnweb.cern.ch/trac/atlasphys/browser/Physics/Higgs/HSG4/software/leplep/MVA_8TeV/Preselection/trunk/Common/analysis.C 
+    lines 2564-2646
+    """
+    def __init__(self, year, **kwargs):
+        self.year=year
+        super(TauVeto, self).__init__(**kwargs)
+
+    def passes(self,event):
+        for tau in event.taus:
+            if tau.author not in (1,3):
+                continue
+            if not tau.JetBDTSigMedium:
+                continue
+            if not (abs(tau.eta<2.47) and tau.numTrack>0 and abs(tau.track_eta[0])<2.47):
+                continue
+            if tau.Et>20*GeV:
+                continue
+            if tau.numTrack not in (1,3):
+                continue
+            if abs(tau.charge-1.) > 1e-3:
+                continue
+            if not (tau.numTrack==1 and tau.EleBDTMedium) or tau.numTrack>1:
+                continue
+            if tau.muonVeto:
+                continue
+            return False
+        return True
+    #need to implement Overlap? 2583
+
 class Triggers(EventFilter):
     """
     See lowest unprescaled triggers here:
