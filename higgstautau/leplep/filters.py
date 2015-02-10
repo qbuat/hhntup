@@ -12,12 +12,43 @@ from ..tauid import IDLOOSE, IDMEDIUM, IDTIGHT
 from . import log; log = log[__name__]
 
 
+class TauVeto(EventFilter):
+    """
+    taken from 
+    https://svnweb.cern.ch/trac/atlasphys/browser/Physics/Higgs/HSG4/software/leplep/MVA_8TeV/Preselection/trunk/Common/analysis.C 
+    lines 2564-2646
+    """
+    def __init__(self, **kwargs):
+        super(TauVeto, self).__init__(**kwargs)
+
+    def passes(self,event):
+        for tau in event.taus:
+            if tau.author not in (1,3):
+                continue
+            if not tau.JetBDTSigMedium:
+                continue
+            if not (abs(tau.eta<2.47) and tau.numTrack>0 and abs(tau.track_eta[0])<2.47):
+                continue
+            if tau.Et<20*GeV:
+                continue
+            if tau.numTrack not in (1,3):
+                continue
+            if abs(tau.charge-1.) > 1e-3:
+                continue
+            if not ((tau.numTrack==1 and tau.EleBDTMedium) or tau.numTrack>1):
+                continue
+            if not tau.muonVeto:
+                continue
+            return False
+        return True
+                        
+    #need to implement Overlap? 2583
 
 class DiLeptonSelection(EventFilter):
     def __init__(self,min_leps,**kwargs):
         super(DiLeptonSelection,self).__init__(**kwargs)
         self.min_leps = min_leps
-
+        #require 2 or more lepton candidates
     def passes(self, event):
         return len(event.electrons)+len(event.muons) >=self.min_leps
 
@@ -46,6 +77,35 @@ class LepEta(EventFilter):
         event.muons.select(lambda muon: abs(muon.eta) < 2.5)
         return len(event.electrons)+len(event.muons) >= self.min_leps
 
+class LepOS(EventFilter):
+    def __init__(self, **kwargs):
+        super(LepOS, self).__init__(**kwargs)
+    def passes(self, event):
+        #if opposite sign then multiplying charges will make negative
+
+        #sort in decending order by pT
+        event.electrons.sort(key=lambda electron: electron.cl_E/cosh(electron.tracketa), reverse=True)
+        event.muons.sort(key=lambda muon: muon.pt, reverse=True)
+        
+        if len(event.electrons)>1:
+            #get highest pt muons
+            event.electrons.slice(0,2)
+            charge=event.electrons[0].charge*event.electrons[1].charge
+        elif len(event.muons)>1:
+            #get highest pt muons
+            event.muons.slice(0,2)
+            charge=event.muons[0].charge*event.muons[1].charge
+        else: 
+            event.electrons.slice(0,1)
+            event.muons.slice(0,1)
+            charge=event.electrons[0].charge*event.muons[0].charge
+        if charge<0: return True
+        elif charge>0: return False
+            
+
+
+#from here on we get specific muon and electron filters.
+#Combine at some point?
 from ..filters import muon_has_good_track
 
 class MuonID(EventFilter):
@@ -166,41 +226,6 @@ class ElectronCone(EventFilter):
         #percentage energy in cone. electron.cl_E/cosh(electron.tracketa) is electron pt
         event.electrons.select(lambda electron: electron.ptcone40/(electron.cl_E/cosh(electron.tracketa))<0.17)
         return len(event.electrons)+len(event.muons) >= self.min_leps
-
-
-
-class TauVeto(EventFilter):
-    """
-    taken from 
-    https://svnweb.cern.ch/trac/atlasphys/browser/Physics/Higgs/HSG4/software/leplep/MVA_8TeV/Preselection/trunk/Common/analysis.C 
-    lines 2564-2646
-    """
-    def __init__(self, year, **kwargs):
-        self.year=year
-        super(TauVeto, self).__init__(**kwargs)
-
-    def passes(self,event):
-        for tau in event.taus:
-            if tau.author not in (1,3):
-                continue
-            if not tau.JetBDTSigMedium:
-                continue
-            if not (abs(tau.eta<2.47) and tau.numTrack>0 and abs(tau.track_eta[0])<2.47):
-                continue
-            if tau.Et<20*GeV:
-                continue
-            if tau.numTrack not in (1,3):
-                continue
-            if abs(tau.charge-1.) > 1e-3:
-                continue
-            if not ((tau.numTrack==1 and tau.EleBDTMedium) or tau.numTrack>1):
-                continue
-            if not tau.muonVeto:
-                continue
-            return False
-        return True
-                        
-    #need to implement Overlap? 2583
 
 class Triggers(EventFilter):
     """

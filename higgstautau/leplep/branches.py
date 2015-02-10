@@ -162,6 +162,7 @@ KEEP = [
     "mu_staco_nTRTOutliers",
     "mu_staco_trackz0pv",
     "mu_staco_ptcone40",
+    "mu_staco_charge",
     "tau_jet_jvtxf",
 ]
 

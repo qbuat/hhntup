@@ -397,7 +397,6 @@ class llskim(ATLASStudent):
                     datatype=datatype,
                     count_funcs=count_funcs),
                 TauVeto(
-                    year=year,
                     count_funcs=count_funcs),
                 DiLeptonSelection(2,
                     count_funcs=count_funcs),
@@ -425,11 +424,13 @@ class llskim(ATLASStudent):
                     count_funcs=count_funcs),
                 ElectronAuthor(2,
                     count_funcs=count_funcs),
-                ElectronPP(2,
-                    count_funcs=count_funcs),
                 ElectronOQ(2,
                     count_funcs=count_funcs),
                 ElectronCone(2,
+                    count_funcs=count_funcs),
+                ElectronPP(2,
+                    count_funcs=count_funcs),
+                LepOS(
                     count_funcs=count_funcs),
             ])
 
