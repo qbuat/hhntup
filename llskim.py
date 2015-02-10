@@ -232,9 +232,9 @@ class llskim(ATLASStudent):
         else:
             tree = outtree.define_object(name='tree', prefix='hh_')
 
-        # tree.define_object(name='tau', prefix='tau_')
-        # tree.define_object(name='tau1', prefix='tau1_')
-        # tree.define_object(name='tau2', prefix='tau2_')
+        tree.define_object(name='lep', prefix='lep_')
+        tree.define_object(name='lep1', prefix='lep1_')
+        tree.define_object(name='lep2', prefix='lep2_')
         # tree.define_object(name='truetau1', prefix='truetau1_')
         # tree.define_object(name='truetau2', prefix='truetau2_')
         # tree.define_object(name='jet1', prefix='jet1_')
@@ -398,6 +398,38 @@ class llskim(ATLASStudent):
                     count_funcs=count_funcs),
                 TauVeto(
                     year=year,
+                    count_funcs=count_funcs),
+                DiLeptonSelection(2,
+                    count_funcs=count_funcs),
+                LepPT(2,
+                    el_thresh=15 * GeV,
+                    mu_thresh=10 * GeV,
+                    count_funcs=count_funcs),
+                LepEta(2,
+                    count_funcs=count_funcs),
+                MuonID(2,
+                    count_funcs=count_funcs),
+                MuonBLayerHits(2,
+                    count_funcs=count_funcs),
+                MuonPixelHits(2,
+                    count_funcs=count_funcs),
+                MuonSCTHits(2,
+                    count_funcs=count_funcs),
+                MuonHoles(2,
+                    count_funcs=count_funcs),
+                MuonTRT(2,
+                    count_funcs=count_funcs),
+                MuonZ0pv(2,
+                    count_funcs=count_funcs),
+                MuonCone(2,
+                    count_funcs=count_funcs),
+                ElectronAuthor(2,
+                    count_funcs=count_funcs),
+                ElectronPP(2,
+                    count_funcs=count_funcs),
+                ElectronOQ(2,
+                    count_funcs=count_funcs),
+                ElectronCone(2,
                     count_funcs=count_funcs),
             ])
 
