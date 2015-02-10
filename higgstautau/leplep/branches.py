@@ -138,6 +138,7 @@ KEEP = [
     "el_TRTHighTOutliersRatio",
     "el_weta2",
     "el_wstot",
+    "el_ptcone40",
 
     "mu_staco_n",
     "mu_staco_E",
@@ -159,7 +160,8 @@ KEEP = [
     "mu_staco_nSCTHoles",
     "mu_staco_nTRTHits",
     "mu_staco_nTRTOutliers",
-
+    "mu_staco_trackz0pv",
+    "mu_staco_ptcone40",
     "tau_jet_jvtxf",
 ]
 
