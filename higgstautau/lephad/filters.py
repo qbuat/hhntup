@@ -11,14 +11,13 @@ from .. import tauid
 from ..tauid import IDLOOSE, IDMEDIUM, IDTIGHT
 from . import log; log = log[__name__]
 
-
 class LeptonSelection(EventFilter):
     def __init__(self,min_leps,**kwargs):
         super(LeptonSelection,self).__init__(**kwargs)
         self.min_leps = min_leps
         #require lepton candidates
     def passes(self, event):
-        return len(event.electrons)+len(event.muons) >=self.min_leps
+        return len(event.electrons) + len(event.muons) >=self.min_leps
 
 class LepPT(EventFilter):
     def __init__(self, min_leps, el_thresh=15*GeV, mu_thresh=10 * GeV, **kwargs):
@@ -26,12 +25,10 @@ class LepPT(EventFilter):
         self.el_thresh = el_thresh
         self.mu_thresh = mu_thresh
         super(LepPT, self).__init__(**kwargs)
-
     def passes(self, event):
-        
         event.electrons.select(lambda electron: electron.cl_E/cosh(electron.tracketa) > self.el_thresh)
         event.muons.select(lambda muon: muon.pt > self.mu_thresh)
-        return len(event.electrons)+len(event.muons) >= self.min_leps
+        return len(event.electrons) + len(event.muons) >= self.min_leps
 
 class LepEta(EventFilter):
     def __init__(self, min_leps, **kwargs):
@@ -41,30 +38,29 @@ class LepEta(EventFilter):
         # both calo and leading track eta within 2.47                                                                
         event.electrons.select(lambda electron: 
             abs(electron.cl_eta) < 1.37 or
-            1.52< abs(electron.cl_eta) < 2.47)
+            1.52 < abs(electron.cl_eta) < 2.47)
         event.muons.select(lambda muon: abs(muon.eta) < 2.5)
-        return len(event.electrons)+len(event.muons) >= self.min_leps
+        return len(event.electrons) + len(event.muons) >= self.min_leps
 
 class LepHad(EventFilter):
     def __init__(self, **kwargs):
         super(LepHad, self).__init__(**kwargs)
     def passes(self, event):
         #make sure it's only one had and one lep
-
         #sort in decending order by pT
         event.electrons.sort(key=lambda electron: electron.cl_E/cosh(electron.tracketa), reverse=True)
         event.muons.sort(key=lambda muon: muon.pt, reverse=True)
         event.taus.sort(key=lambda tau: tau.pt, reverse=True)
-
-        if len(event.taus)!=1: return False
-        if len(event.electrons)==1: return True
-        elif len(event.muons)==1: return True
-        else: return False #there may be only one!
-
+        if len(event.taus) != 1: 
+            return False
+        if len(event.electrons) == 1:
+            return True
+        elif len(event.muons) == 1:
+            return True
+        else: 
+            return False
 
 #from here on we get specific muon and electron filters.
-#Combine at some point?
-from ..filters import muon_has_good_track
 
 class MuonID(EventFilter):
     def __init__(self, min_leps, **kwargs):
@@ -73,7 +69,7 @@ class MuonID(EventFilter):
     def passes(self, event):
         #misc muon cuts
         event.muons.select(lambda muon: muon.tight)
-        return len(event.electrons)+len(event.muons) >= self.min_leps
+        return len(event.electrons) + len(event.muons) >= self.min_leps
 
 class MuonHits(EventFilter):
     def __init__(self, min_leps, **kwargs):
@@ -82,100 +78,41 @@ class MuonHits(EventFilter):
     def passes(self, event):
         # Bottom layer requirements 
         event.muons.select(lambda muon:
-            muon.expectBLayerHit==0 or muon.nBLHits>0)
+            muon.expectBLayerHit == 0 or muon.nBLHits > 0)
         # Pixel hits
         event.muons.select(lambda muon:
-            (muon.nPixHits + muon.nPixelDeadSensors)>0)
+            (muon.nPixHits + muon.nPixelDeadSensors) > 0)
         # SCT hits
         event.muons.select(lambda muon:
-            (muon.nSCTHits + muon.nSCTDeadSensors)>0)
+            (muon.nSCTHits + muon.nSCTDeadSensors) > 0)
         # Holes
         event.muons.select(lambda muon:
-            (muon.nPixHoles + muon.nSCTHoles)<3)
+            (muon.nPixHoles + muon.nSCTHoles) < 3)
         # TRT
         event.muons.select(lambda muon:
-            (0.1<abs(muon.eta)<1.9 and
-             (muon.nTRTHits+muon.nTRTOutliers)>5 and
-             muon.nTRTOutliers<0.9*(muon.nTRTHits+muon.nTRTOutliers)) or
-            (( abs(muon.eta)<=0.1 or abs(muon.eta)>=1.9) and
-            not ((muon.nTRTHits+muon.nTRTOutliers)>5 and muon.nTRTOutliers>=0.9*(muon.nTRTHits+muon.nTRTOutliers))))
-        return len(event.electrons)+len(event.muons) >= self.min_leps
-
-
-class MuonBLayerHits(EventFilter):
-    def __init__(self, min_leps, **kwargs):
-        self.min_leps = min_leps
-        super(MuonBLayerHits, self).__init__(**kwargs)
-    def passes(self, event):
-        #muon hit requirements
-        event.muons.select(lambda muon:
-            muon.expectBLayerHit==0 or muon.nBLHits>0)
-        return len(event.electrons)+len(event.muons) >= self.min_leps
-
-class MuonPixelHits(EventFilter):
-    def __init__(self, min_leps, **kwargs):
-        self.min_leps = min_leps
-        super(MuonPixelHits, self).__init__(**kwargs)
-    def passes(self, event):
-        #misc muon cuts
-        event.muons.select(lambda muon:
-            (muon.nPixHits + muon.nPixelDeadSensors)>0)
-        return len(event.electrons)+len(event.muons) >= self.min_leps
-
-class MuonSCTHits(EventFilter):
-    def __init__(self, min_leps, **kwargs):
-        self.min_leps = min_leps
-        super(MuonSCTHits, self).__init__(**kwargs)
-    def passes(self, event):
-        #muon hit requirements
-        event.muons.select(lambda muon:
-            (muon.nSCTHits + muon.nSCTDeadSensors)>0)
-        return len(event.electrons)+len(event.muons) >= self.min_leps
-
-class MuonHoles(EventFilter):
-    def __init__(self, min_leps, **kwargs):
-        self.min_leps = min_leps
-        super(MuonHoles, self).__init__(**kwargs)
-    def passes(self, event):
-        #muon hit requirements
-        event.muons.select(lambda muon:
-            (muon.nPixHoles + muon.nSCTHoles)<3)
-        return len(event.electrons)+len(event.muons) >= self.min_leps
-
-class MuonTRT(EventFilter):
-    def __init__(self, min_leps, **kwargs):
-        self.min_leps = min_leps
-        super(MuonTRT, self).__init__(**kwargs)
-    def passes(self, event):
-        #muon TRT requirements AKA the Demon Clause
-        
-        #2 clauses
-        #either in nice eta region with enough hits that are less than 90% outliers
-        #...or...
-        #if outside region, veto events with good hits keep those with crappy hits.
-        event.muons.select(lambda muon:
-            (0.1<abs(muon.eta)<1.9 and
-             (muon.nTRTHits+muon.nTRTOutliers)>5 and
-             muon.nTRTOutliers<0.9*(muon.nTRTHits+muon.nTRTOutliers)) or
-            (( abs(muon.eta)<=0.1 or abs(muon.eta)>=1.9) and
-            not ((muon.nTRTHits+muon.nTRTOutliers)>5 and muon.nTRTOutliers>=0.9*(muon.nTRTHits+muon.nTRTOutliers))))
-        return len(event.electrons)+len(event.muons) >= self.min_leps
+            (0.1 < abs(muon.eta) < 1.9 and
+             (muon.nTRTHits+muon.nTRTOutliers) > 5 and
+             muon.nTRTOutliers < 0.9 * (muon.nTRTHits+muon.nTRTOutliers)) or
+             (( abs(muon.eta) <= 0.1 or abs(muon.eta) >= 1.9) and
+             not ((muon.nTRTHits+muon.nTRTOutliers) > 5 and 
+             muon.nTRTOutliers >= 0.9 * (muon.nTRTHits+muon.nTRTOutliers))))
+        return len(event.electrons) + len(event.muons) >= self.min_leps
 
 class MuonZ0pv(EventFilter):
     def __init__(self, min_leps, **kwargs):
         self.min_leps = min_leps
         super(MuonZ0pv, self).__init__(**kwargs)
     def passes(self, event):
-        event.muons.select(lambda muon: muon.trackz0pv<10)
-        return len(event.electrons)+len(event.muons) >= self.min_leps
+        event.muons.select(lambda muon: muon.trackz0pv < 10)
+        return len(event.electrons) + len(event.muons) >= self.min_leps
 
 class MuonCone(EventFilter):
     def __init__(self, min_leps, **kwargs):
         self.min_leps = min_leps
         super(MuonCone, self).__init__(**kwargs)
     def passes(self, event):
-        event.muons.select(lambda muon: muon.ptcone40/muon.pt<0.09)
-        return len(event.electrons)+len(event.muons) >= self.min_leps
+        event.muons.select(lambda muon: muon.ptcone40 / muon.pt < 0.09)
+        return len(event.electrons) + len(event.muons) >= self.min_leps
 
 class ElectronAuthor(EventFilter):
     def __init__(self, min_leps, **kwargs):
@@ -183,8 +120,8 @@ class ElectronAuthor(EventFilter):
         super(ElectronAuthor, self).__init__(**kwargs)
     def passes(self, event):
         #extra misc electron cuts
-        event.electrons.select(lambda electron: electron.author in (1,3) )
-        return len(event.electrons)+len(event.muons) >= self.min_leps
+        event.electrons.select(lambda electron: electron.author in (1, 3))
+        return len(event.electrons) + len(event.muons) >= self.min_leps
 
 class ElectronPP(EventFilter):
     def __init__(self, min_leps, **kwargs):
@@ -192,7 +129,7 @@ class ElectronPP(EventFilter):
         super(ElectronPP, self).__init__(**kwargs)
     def passes(self, event):
         event.electrons.select(lambda electron: electron.mediumPP)
-        return len(event.electrons)+len(event.muons) >= self.min_leps
+        return len(event.electrons) + len(event.muons) >= self.min_leps
 
 class ElectronOQ(EventFilter):
     def __init__(self, min_leps, **kwargs):
@@ -200,8 +137,8 @@ class ElectronOQ(EventFilter):
         super(ElectronOQ, self).__init__(**kwargs)
     def passes(self, event):
         #extra misc electron cuts
-        event.electrons.select(lambda electron: (electron.OQ&1446)==0)
-        return len(event.electrons)+len(event.muons) >= self.min_leps
+        event.electrons.select(lambda electron: (electron.OQ & 1446)==0)
+        return len(event.electrons) + len(event.muons) >= self.min_leps
 
 class ElectronCone(EventFilter):
     def __init__(self, min_leps, **kwargs):
@@ -209,8 +146,8 @@ class ElectronCone(EventFilter):
         super(ElectronCone, self).__init__(**kwargs)
     def passes(self, event):
         #percentage energy in cone. electron.cl_E/cosh(electron.tracketa) is electron pt
-        event.electrons.select(lambda electron: electron.ptcone40/(electron.cl_E/cosh(electron.tracketa))<0.17)
-        return len(event.electrons)+len(event.muons) >= self.min_leps
+        event.electrons.select(lambda electron: electron.ptcone40 / (electron.cl_E / cosh(electron.tracketa)) <0.17)
+        return len(event.electrons) + len(event.muons) >= self.min_leps
 
 class Triggers(EventFilter):
     """
