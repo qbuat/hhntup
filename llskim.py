@@ -30,8 +30,8 @@ from higgstautau.batch import ATLASStudent
 from higgstautau.units import GeV
 from higgstautau.mixins import *
 from higgstautau.filters import *
-from higgstautau.leplep import branches as hhbranches
-from higgstautau.leplep.objects import define_objects
+from higgstautau import branches as branches
+from higgstautau.objects import define_objects
 from higgstautau.leplep.models import *
 from higgstautau.leplep.filters import *
 from higgstautau import mass
@@ -441,11 +441,11 @@ class llskim(ATLASStudent):
         with root_open(self.files[0]) as test_file:
             test_tree = test_file.Get(self.metadata.treename)
             ignore_branches = test_tree.glob(
-                hhbranches.REMOVE,
-                exclude=hhbranches.KEEP)
+                branches.REMOVE,
+                exclude=branches.KEEP)
             ignore_branches_output = test_tree.glob(
-                hhbranches.REMOVE_OUTPUT,
-                exclude=hhbranches.KEEP_OUTPUT)
+                branches.REMOVE_OUTPUT,
+                exclude=branches.KEEP_OUTPUT)
 
         # initialize the TreeChain of all input files
         chain = TreeChain(
