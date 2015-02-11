@@ -113,8 +113,33 @@ class MuonID(EventFilter):
         self.min_leps = min_leps
         super(MuonID, self).__init__(**kwargs)
     def passes(self, event):
-        #misc muon cuts
         event.muons.select(lambda muon: muon.tight)
+        return len(event.electrons)+len(event.muons) >= self.min_leps
+
+class MuonHits(EventFilter):
+    def __init__(self, min_leps, **kwargs):
+        self.min_leps = min_leps
+        super(MuonHits, self).__init__(**kwargs)
+    def passes(self, event):
+        # Bottom layer requirements 
+        event.muons.select(lambda muon:
+            muon.expectBLayerHit==0 or muon.nBLHits>0)
+        # Pixel hits
+        event.muons.select(lambda muon:
+            (muon.nPixHits + muon.nPixelDeadSensors)>0)
+        # SCT hits
+        event.muons.select(lambda muon:
+            (muon.nSCTHits + muon.nSCTDeadSensors)>0)
+        # Holes
+        event.muons.select(lambda muon:
+            (muon.nPixHoles + muon.nSCTHoles)<3)
+        # TRT
+        event.muons.select(lambda muon:
+            (0.1<abs(muon.eta)<1.9 and
+             (muon.nTRTHits+muon.nTRTOutliers)>5 and
+             muon.nTRTOutliers<0.9*(muon.nTRTHits+muon.nTRTOutliers)) or
+            (( abs(muon.eta)<=0.1 or abs(muon.eta)>=1.9) and
+            not ((muon.nTRTHits+muon.nTRTOutliers)>5 and muon.nTRTOutliers>=0.9*(muon.nTRTHits+muon.nTRTOutliers))))
         return len(event.electrons)+len(event.muons) >= self.min_leps
 
 class MuonBLayerHits(EventFilter):
