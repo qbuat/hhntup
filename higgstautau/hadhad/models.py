@@ -454,8 +454,7 @@ class TrueTauBlock((TrueTau + MatchedObject).prefix('truetau1_') +
                 raise RuntimeError('Something is wrong with the regular expression')
 
             tree_object = tree.truetau1
-            tree_object.nProng = int(match_1.group('prong')) if match_1.group('co') is None else \
-                int(match_1.group('prong')) + int(match_1.group('co'))
+            tree_object.nProng = truetau.auxdataConst('unsigned long')('NTracks')
             tree_object.nPi0 = int(match_1.group('pi0')) if match_1.group('no') is None else \
                  int(match_1.group('pi0')) + int(match_1.group('no'))
             tree_object.charge = truetau.charge()
