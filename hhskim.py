@@ -454,11 +454,11 @@ class hhskim(ATLASStudent):
                 #     passthrough=datatype in (datasets.DATA, datasets.EMBED),
                 #     count_funcs=count_funcs),
                 # NEED TO BE CONVERTED TO XAOD
-                HiggsPT(
-                    year=year,
-                    tree=tree,
-                    passthrough=not is_signal or local,
-                    count_funcs=count_funcs),
+                # HiggsPT(
+                #     year=year,
+                #     tree=tree,
+                #     passthrough=not is_signal or local,
+                #     count_funcs=count_funcs),
                 # NEED TO BE CONVERTED TO XAOD
                 # TauTrackRecounting(
                 #     year=year,
@@ -582,8 +582,12 @@ class hhskim(ATLASStudent):
                 create_branches=True,
                 visible=False)
 
-            # create the MMC
-            mmc = mass.MMC(year=year)
+            # # create the MMC
+            # mmc = mass.MMC(year=year)
+            from ROOT import MissingMassTool
+            mass_tool = MissingMassTool('mass_tool')
+            mass_tool.initialize()
+
 
         # report which packages have been loaded
         # externaltools.report()
@@ -594,7 +598,6 @@ class hhskim(ATLASStudent):
         # the event filters above are automatically run for each event and only
         # the surviving events are looped on
         for event in chain:
-
             if local and syst_terms is None and not redo_selection:
                 outtree.Fill()
                 continue
@@ -706,7 +709,7 @@ class hhskim(ATLASStudent):
             #########################
             # MET variables
             #########################
-            MET = event.MET[0]
+            MET = event.MET.collection['Final']
             METx = MET.mpx()
             METy = MET.mpy()
             METet = MET.met()
@@ -801,43 +804,54 @@ class hhskim(ATLASStudent):
             # ##########################
             # # MMC Mass
             # ##########################
-            mmc_result = mmc.mass(
-                tau1, tau2,
-                METx, METy, sumET,
-                njets=len(event.jets))
+            # OLD USAGE
+            # mmc_result = mmc.mass(
+            #     tau1, tau2,
+            #     METx, METy, sumET,
+            #     njets=len(event.jets))
+            # for mmc_method, mmc_object in enumerate(mmc_objects):
+            #     mmc_mass, mmc_resonance, mmc_met = mmc_result[mmc_method]
+            #     if verbose:
+            #         log.info("MMC (method %d): %f" % (mmc_method, mmc_mass))
 
-            for mmc_method, mmc_object in enumerate(mmc_objects):
-                mmc_mass, mmc_resonance, mmc_met = mmc_result[mmc_method]
-                if verbose:
-                    log.info("MMC (method %d): %f" % (mmc_method, mmc_mass))
+            #     mmc_object.mass = mmc_mass
+            #     mmc_object.MET_et = mmc_met.Mod()
+            #     mmc_object.MET_etx = mmc_met.X()
+            #     mmc_object.MET_ety = mmc_met.Y()
+            #     mmc_object.MET_phi = math.pi - mmc_met.Phi()
+            #     if mmc_mass > 0:
+            #         FourMomentum.set(mmc_object.resonance, mmc_resonance)
 
-                mmc_object.mass = mmc_mass
-                mmc_object.MET_et = mmc_met.Mod()
-                mmc_object.MET_etx = mmc_met.X()
-                mmc_object.MET_ety = mmc_met.Y()
-                mmc_object.MET_phi = math.pi - mmc_met.Phi()
-                if mmc_mass > 0:
-                    FourMomentum.set(mmc_object.resonance, mmc_resonance)
+            mass_tool.apply(event.EventInfo, tau1, tau2, MET, len(event.jets))
+            for i, mmc_object in enumerate(mmc_objects):
+                mmc_object.mass = event.EventInfo.auxdataConst('double')('mmc%s_mass' % i)
+                mmc_object.MET_et = mass_tool.GetFittedMetVec(i).Mod()
+                mmc_object.MET_etx = mass_tool.GetFittedMetVec(i).X()
+                mmc_object.MET_ety = mass_tool.GetFittedMetVec(i).Y()
+                mmc_object.MET_phi = math.pi - mass_tool.GetFittedMetVec(i).Phi()
+                if mmc_object.mass > 0:
+                    FourMomentum.set(mmc_object.resonance, mass_tool.GetResonanceVec(i))
+
 
             # ############################
             # # collinear and visible mass
             # ############################
-            vis_mass, collin_mass, tau1_x, tau2_x = mass.collinearmass(
-                tau1, tau2, METx, METy)
+            # vis_mass, collin_mass, tau1_x, tau2_x = mass.collinearmass(
+            #     tau1, tau2, METx, METy)
 
-            tree.mass_vis_tau1_tau2 = vis_mass
-            tree.mass_collinear_tau1_tau2 = collin_mass
-            tau1.collinear_momentum_fraction = tau1_x
-            tau2.collinear_momentum_fraction = tau2_x
+            # tree.mass_vis_tau1_tau2 = vis_mass
+            # tree.mass_collinear_tau1_tau2 = collin_mass
+            # tau1.collinear_momentum_fraction = tau1_x
+            # tau2.collinear_momentum_fraction = tau2_x
 
             # # Fill the tau block
             # # This must come after the RecoJetBlock is filled since
             # # that sets the jet_beta for boosting the taus
             RecoTauBlock.set(event, tree, datatype, tau1, tau2, local=local)
 
-            # NEED TO BE CONVERTED TO XAOD
-            if datatype != datasets.DATA:
-                TrueTauBlock.set(tree, tau1, tau2)
+            # if datatype != datasets.DATA:
+            #     TrueTauBlock.set(tree, tau1, tau2)
+
             # fill the output tree
             outtree.Fill(reset=True)
 

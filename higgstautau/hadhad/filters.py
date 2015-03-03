@@ -157,10 +157,10 @@ class ElectronVeto(EventFilter):
                 continue
             if el.passSelection(self.el_sel) != 1:
                 continue
-            from array import array as carray
-            mask = carray('I', [ROOT.xAOD.EgammaParameters.BADCLUSELECTRON])
-            if not el.isGoodOQ(mask[0]):
-                continue
+            # from array import array as carray
+            # mask = carray('I', [ROOT.xAOD.EgammaParameters.BADCLUSELECTRON])
+            # if not el.isGoodOQ(mask[0]):
+            #     continue
             return False
         return True
 

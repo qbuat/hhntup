@@ -29,7 +29,6 @@ class xAODTreeCollection(object):
         self.__cache_objects = cache
         self.__cache = {}
 
-
     def __nonzero__(self):
 
         return len(self) > 0

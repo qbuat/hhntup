@@ -71,6 +71,6 @@ class JetResolution(EventFilter):
             
     def passes(self, event):
 
-        for jet in event.jets:
+        for jet in event.jets.collection:
             self.jer_smearing_tool.applyCorrection(jet)
         return True

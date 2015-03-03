@@ -513,7 +513,7 @@ class RecoJetTrueTauMatching(EventFilter):
                     # TODO: handle possible collision!
                     jet.matched = True
                     jet.matched_dr = dr
-                    jet.matched_object = truetau
+                    jet.matched_object = p
                     break
         return True
 

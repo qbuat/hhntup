@@ -1,4 +1,5 @@
 import math
+import array
 import ROOT
 from rootpy.vector import LorentzVector
 
@@ -25,7 +26,7 @@ def mass(tau1, tau2, METpx, METpy):
     """
     recTau1 = LorentzVector()
     recTau2 = LorentzVector()
-
+    print tau1, tau2
     # tau 4-vector; synchronize for MMC calculation
     if tau1.nTracks() < 3:
         recTau1.SetPtEtaPhiM(tau1.pt(), tau1.eta(), tau1.phi(), 800.) # MeV
@@ -38,17 +39,41 @@ def mass(tau1, tau2, METpx, METpy):
         recTau2.SetPtEtaPhiM(tau2.pt(), tau2.eta(), tau2.phi(), 1200.) # MeV
 
     K = ROOT.TMatrixD(2, 2)
-    K[0][0] = recTau1.Px(); K[0][1] = recTau2.Px()
-    K[1][0] = recTau1.Py(); K[1][1] = recTau2.Py()
+    K.InsertRow(0, 0, array.array('d', [recTau1.Px(), recTau2.Px()]));
+    K.InsertRow(1, 0, array.array('d', [recTau1.Py(), recTau2.Py()]));
 
+    # deprecated in ROOT6
+    # K[0][0] = recTau1.Px()
+    # K[0][1] = recTau2.Px()
+    # K[1][0] = recTau1.Py(); 
+    # K[1][1] = recTau2.Py()
+    print K.Determinant()
     if K.Determinant() == 0:
         return -1., -1111., -1111.
 
     M = ROOT.TMatrixD(2, 1)
-    M[0][0] = METpx
-    M[1][0] = METpy
-
+    M.InsertRow(0, 0, array.array('d', [METpx]))
+    M.InsertRow(1, 0, array.array('d', [METpy]))
+    print
+    print METpx, METpy
+    print
+    print M[0][0], M[1][0]
+    # M[0][0] = METpx
+    # M[1][0] = METpy
+    print 
+    print recTau1.Px(), recTau2.Px()
+    print recTau1.Py(), recTau2.Py()
+    print
+    print K[0][0], K[0][1]
+    print K[1][0], K[1][1]
+    print 'Something wrong after inversion'
     Kinv = K.Invert()
+    print Kinv[0][0], Kinv[0][1]
+    print Kinv[1][0], Kinv[1][1]
+    print
+    print Kinv.Determinant()
+    print (K * Kinv)[0][0], (K * Kinv)[0][1]
+    print (K * Kinv)[1][0], (K * Kinv)[1][1]
 
     X = Kinv * M
 
