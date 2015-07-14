@@ -187,4 +187,9 @@ REMOVE_OUTPUT = [
 ]
 
 # override REMOVE_OUTPUT above
-KEEP_OUTPUT = []
+KEEP_OUTPUT = [
+    'jet_antikt4truth_pt',
+    'jet_antikt4truth_eta',
+    'jet_antikt4truth_phi',
+    'jet_antikt4truth_m',
+]

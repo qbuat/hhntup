@@ -240,6 +240,13 @@ class hhskim(ATLASStudent):
         tree.define_object(name='jet1', prefix='jet1_')
         tree.define_object(name='jet2', prefix='jet2_')
         tree.define_object(name='jet3', prefix='jet3_')
+        tree.define_object(name='parton1', prefix='parton1_')
+        tree.define_object(name='parton2', prefix='parton2_')
+        tree.define_object(name='parton3', prefix='parton3_')
+        tree.define_object(name='partin1', prefix='partin1_')
+        tree.define_object(name='partin2', prefix='partin2_')
+        tree.define_object(name='higgs', prefix='higgs_')
+
 
         mmc_objects = [
             tree.define_object(name='mmc0', prefix='mmc0_'),
@@ -912,6 +919,27 @@ class hhskim(ATLASStudent):
             #            for parton in (parton1, parton2):
             #                if utils.dR(jet.eta, jet.phi, parton.eta, parton.phi) < .8:
             #                    setattr(tree, 'jet%i_matched' % i, True)
+
+            if not local and datatype == datasets.MC and 'VBF' in dsname and year == 2012:
+                # get partons (already sorted by eta in hepmc) FIXME!!!
+                # also gluon needs to be in final position... vince fix
+                partons = hepmc.get_VBF_partons(event)
+                partons.sort(key=lambda p:p.fourvect.Pt(),reverse=True)
+                if len(partons)>2:
+                    parton1, parton2, parton3 = partons[:3]
+                elif len(partons)==2:
+                    parton1, parton2 = partons[:2]      
+                    parton3 = None
+                #now repeat for incoming partons
+                partin1 , partin2  = hepmc.get_VBF_partins(event)
+                higgs = hepmc.get_MC_higgles(event)
+                if len(higgs)==1:
+                    higgs=higgs[0]
+
+                
+                PartonBlock.set(tree, parton1, parton2, parton3, partin1, partin2, higgs, local=local)
+            elif not local:
+                print 'not VBF ',datatype,' datatype ',dsname,' dsname'
 
             # Fill the tau block
             # This must come after the RecoJetBlock is filled since
