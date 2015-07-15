@@ -107,7 +107,7 @@ for dataset in _datasets:
         n, k = args.split.split(':')
         files = get_chunk(files, int(n), int(k))
         outputname += '_%d' % int(k)
-    
+    print outputname
     supervisor = ATLASSupervisor(
         student = args.student,
         outputname = outputname,
