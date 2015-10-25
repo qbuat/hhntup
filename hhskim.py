@@ -920,7 +920,8 @@ class hhskim(ATLASStudent):
             #                if utils.dR(jet.eta, jet.phi, parton.eta, parton.phi) < .8:
             #                    setattr(tree, 'jet%i_matched' % i, True)
 
-            if not local and datatype == datasets.MC and 'VBF' in dsname and year == 2012:
+            if not local and datatype == datasets.MC and 'VBF' in dsname and not 'PowhegJimmy' in dsname and year == 2012:
+                log.info(dsname)
                 # get partons (already sorted by eta in hepmc) FIXME!!!
                 # also gluon needs to be in final position... vince fix
                 partons = hepmc.get_VBF_partons(event)
@@ -931,15 +932,21 @@ class hhskim(ATLASStudent):
                     parton1, parton2 = partons[:2]      
                     parton3 = None
                 #now repeat for incoming partons
-                partin1 , partin2  = hepmc.get_VBF_partins(event)
+                partins  = hepmc.get_VBF_partins(event)
+                log.info(partins)
+                if len(partins) >= 2:
+                    partin1, partin2 = partins[:2]
+                else:
+                    partin1 = None
+                    partin2 = None
                 higgs = hepmc.get_MC_higgles(event)
                 if len(higgs)==1:
                     higgs=higgs[0]
 
                 
                 PartonBlock.set(tree, parton1, parton2, parton3, partin1, partin2, higgs, local=local)
-            elif not local:
-                print 'not VBF ',datatype,' datatype ',dsname,' dsname'
+            # elif not local:
+            #     print 'not VBF ',datatype,' datatype ',dsname,' dsname'
 
             # Fill the tau block
             # This must come after the RecoJetBlock is filled since
@@ -947,6 +954,13 @@ class hhskim(ATLASStudent):
             RecoTauBlock.set(event, tree, datatype, tau1, tau2, local=local)
             if datatype != datasets.DATA:
                 TrueTauBlock.set(tree, tau1, tau2)
+
+            # PDF / QCD scale 
+            tree.mcevent_pdf_id1_0 = event.mcevt_pdf_x1[0]
+            tree.mcevent_pdf_id2_0 = event.mcevt_pdf_x2[0]
+            tree.mcevent_pdf_x1_0 = event.mcevt_pdf_x1[0]
+            tree.mcevent_pdf_x2_0 = event.mcevt_pdf_x2[0]
+            tree.mcevent_pdf_scale_0 = event.mcevt_pdf_scale[0]
 
             # fill the output tree
             outtree.Fill(reset=True)
