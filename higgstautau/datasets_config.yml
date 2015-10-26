@@ -53,8 +53,8 @@
         data_sampletype: 'standard'
         data_period_containers: True
     vbf:
-        mc_path: '/cluster/data01/qbuat/skims/vince'
-        mc_prefix: 'user.vcroft.hhskim'
+        mc_path: '/cluster/warehouse/qbuat/skims/v45'
+        mc_prefix: 'group.phys-higgs.hhskim'
         mc_pattern: '*hadhad*.root'
         mc_treename: 'tau'
         mc_sampletype: 'standard'

@@ -41,6 +41,14 @@ gg_mcatnlo:
     samples:
         - 'McAtNloJim_ggH125_tautauInc.mc12a'
 
+gg_popy_hj:
+    name: gg_popy_hj
+    latex: '$ggH\rightarrow\tau_{h}\tau_{h}$'
+    root: 'ggH#rightarrow#tau_{h}#tau_{h}'
+    samples:
+       - 'PowPyth8_AU2CT10_HJ_MINLO_ggH125_tautauhh.mc12b'
+
+
 vbf:
     name: vbfhtautau
     latex: 'VBF $H\rightarrow\tau_{h}\tau_{h}$'

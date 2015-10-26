@@ -236,3 +236,4 @@ mc:
         - 'PowJim_AUET2CT10_VBFH125_tautauInc.mc12b'
         # MC@NLO
         - 'McAtNloJim_ggH125_tautauInc.mc12a'
+        - 'PowPyth8_AU2CT10_HJ_MINLO_ggH125_tautauhh.mc12b'
