@@ -955,12 +955,13 @@ class hhskim(ATLASStudent):
             if datatype != datasets.DATA:
                 TrueTauBlock.set(tree, tau1, tau2)
 
-            # PDF / QCD scale 
-            tree.mcevent_pdf_id1_0 = event.mcevt_pdf_x1[0]
-            tree.mcevent_pdf_id2_0 = event.mcevt_pdf_x2[0]
-            tree.mcevent_pdf_x1_0 = event.mcevt_pdf_x1[0]
-            tree.mcevent_pdf_x2_0 = event.mcevt_pdf_x2[0]
-            tree.mcevent_pdf_scale_0 = event.mcevt_pdf_scale[0]
+            if not local:
+                # PDF / QCD scale 
+                tree.mcevent_pdf_id1_0 = event.mcevt_pdf_x1[0]
+                tree.mcevent_pdf_id2_0 = event.mcevt_pdf_x2[0]
+                tree.mcevent_pdf_x1_0 = event.mcevt_pdf_x1[0]
+                tree.mcevent_pdf_x2_0 = event.mcevt_pdf_x2[0]
+                tree.mcevent_pdf_scale_0 = event.mcevt_pdf_scale[0]
 
             # fill the output tree
             outtree.Fill(reset=True)
